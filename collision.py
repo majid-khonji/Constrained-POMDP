@@ -227,15 +227,15 @@ def prob_collision(c1, c2, sample_size = 100, idx = None, violate_lines=None):
     else:
         return col_count/sample_size
 
-def prob_collision_upper_bound(c0,c1):
-    car = [c0,c1]
-    C, idx = _candidate_collision_points(c0,c1) # no need to iterate here
+def prob_collision_upper_bound(c1, c2):
+    car = [c1, c2]
+    C, idx = _candidate_collision_points(c1, c2) # no need to iterate here
     ###############################################3
     ###############################################3
     ###############################################3
     ###############################################3
     # idx = [[(0,1),(1,0)], [(0,0), (1,1)], [(0,2), (1,3)], [(0,3),(0,2)]] #########################3
-    idx = [[(0,1),(1,0)]]
+    # idx = [[(0,1),(1,0)]]
     ###############################################3
     ###############################################3
     ###############################################3
@@ -250,9 +250,9 @@ def prob_collision_upper_bound(c0,c1):
         k = idx[x][0][1] # kth line of for i
         k_ = idx[x][1][1] # k_th line for j
 
-        max_prob = 0
         # iterating over list L,
         max_of_cars = 0
+        pr = [[],[]]
         for m in [0,1]:
             sum_per_car = 0
             k__ = idx[x][m][1]  # k__th line for m
@@ -297,6 +297,7 @@ def prob_collision_upper_bound(c0,c1):
                     C_ = c_p - (( b_p*(c_k*a_k_- a_k * c_k_ ) + a_p*(b_k * c_k_ - c_k*b_k_) )/ (b_k*a_k_ - a_k*b_k_)  )
                     val = 0.5 * (1+ s.erf(C_/(np.sqrt(Psi)*np.sqrt(2))) )
                     sum_per_car += val
+                    pr[m].append(val)
                     print("The value is  ", val)
                     print("____")
 
@@ -320,8 +321,13 @@ def prob_collision_upper_bound(c0,c1):
         # print("max sum prob = ", max_of_cars)
         # print("1-max sum  = ",1- max_of_cars)
         print("###################")
+        print("point c max prob = ", max(pr[0]) + max(pr[1]))
+        print("point c bound prob = ",max_of_cars)
+        print("###################")
         # sum_prob += max_prob
         sum_prob += max_of_cars
+        # sum_prob += max(pr[0]) + max(pr[1])
+        # print(pr)
 
     prob_bound = len(idx) - sum_prob
     print("Paper bound:  ", prob_bound)

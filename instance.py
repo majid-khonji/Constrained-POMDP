@@ -4,17 +4,18 @@ from itertools import product
 
 class Instance:  # compatible with durative CC-POMDP
     name = ""  # instance name
+    type = "min" # or max
     states = []
     observations = []
     actions = []
     horizon = 3
 
-    b0 = {}  # initial belief, use dict for non-zero values only
+    b0 = {}  # initial belief, use dict for non-zero values only # TODO should be state idx instead of state
     goal_state = 0
     states_reachable_to = {} # states that can reach s [to speedup prior computation]
 
     delta = 0
-    risk_states = [] # states such that risk_model(s,a) > 0 for any a
+    risk_states = states # states such that risk_model(s,a) > 0 for any a, by default is the same as states [used for speed up]
 
 
     def trans_model(self, s, a):
@@ -33,7 +34,8 @@ class Instance:  # compatible with durative CC-POMDP
         return np.floor((len(q)+1)/2)
 
     def reward_heuristic(self, s, a):
-        pass
+        return self.reward_model(s,a)
+
     def risk_heuristic(self,s,a):
         pass
 
@@ -202,3 +204,44 @@ class GridInstance(Instance):
         for j in np.arange(self.grid_size[1]):
             print("──", end='')
         print("─┘")
+
+
+
+class TigerInstance(Instance):
+    type = 'max'
+    name = "Tiger"
+    states = ["tiger-left", "tiger-right"]
+    actions = ["open-left", "open-right", 'listen']
+    observations = ["tiger-left", "tiger-right"]
+
+    risk_states = states
+
+    # trans_prob = np.array([[[1, 0], [0, 1]], [[1, 0], [0, 1]], [[1.0, 0.0], [0.0, 1.0]]])  # np.array
+    # obs_prob = np.array(
+    #     [[[0.5, 0.5], [0.5, 0.5]], [[0.5, 0.5], [0.5, 0.5]], [[0.85, 0.15], [0.15, 0.85]]])  # np.array
+
+    states_reachable_to = {0:[0,1], 1:[0,1]}
+    b0 = {0:.5, 1:.5}
+
+    def trans_model(self, s, a):
+        # return {0: self.trans_prob[s][a][0], 1: self.trans_prob[s][a][1]}
+        return {0:.5, 1:.5} if a != 2 else {s:1}
+
+    def obs_model(self, s, a):
+        return {s: 85, 1-s: 15} if a == 2 else {0:.5, 1:.5}
+
+
+    def reward_model(self, s, a):
+        if a == 2:
+            return -1
+        elif a == s:
+            return -100
+        else:
+            return 10
+
+    def risk_model(self, s, a):
+        return s == a
+    # def reward_heuristic(self, s, a):
+    #     return self.reward_model(s,a)
+
+

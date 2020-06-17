@@ -1,7 +1,7 @@
 # Constrained-POMDP
-Two main parts: POMDP and collision detection.
-## Constrained POMDP with durative actions
-Current implementation includes heuristic forward search approach
+Two main parts
+## constrained POMDP with durative actions
+
 ## Collision detection
 between two rectangles with uncertainty in location.
 * sampling implementation

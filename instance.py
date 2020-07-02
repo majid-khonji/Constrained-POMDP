@@ -114,9 +114,10 @@ class GridInstance(Instance):
     # returns number of walls
     def obs_model(self, s, a):
         (i, j) = s
-        if s == (self.grid_size[0] - 1, self.grid_size[1] - 1) or s == (0, 0):
+        m,n = self.grid_size[0] -1, self.grid_size[1]-1
+        if s == (m, n) or s == (0, 0) or s == (m,0) or s == (0,n):
             return {2: .85, 1: 0.075, 0: 0.075}
-        elif i == 0 or i == self.grid_size[0] - 1 or j == 0 or j == self.grid_size[1] - 1:
+        elif i == 0 or i == m or j == 0 or j == n:
             return {2: 0.075, 1: .85, 0: 0.075}
         else:
             return {2: 0.075, 1: 0.075, 0: .85}
